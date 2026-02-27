@@ -1,0 +1,98 @@
+Here's a comprehensive prompt you can use to build this web app:
+
+---
+
+## 🧬 Prompt: Early Stage Cancer Detection Web App
+
+```
+Build a production-grade AI-powered Early Cancer Detection System web application using React. 
+
+---
+
+### CONTEXT & PURPOSE
+This is a clinical-grade medical tool used by oncologists, radiologists, and screening centers to detect cancer at early stages using AI analysis of medical imaging, blood biomarkers, and patient history.
+
+---
+
+### DESIGN DIRECTION
+- Aesthetic: Medical precision meets calm confidence — dark navy/deep teal base with crisp white text, sharp electric-cyan accents for alerts and risk scores, subtle grid textures
+- Tone: Clinical, authoritative, trustworthy — NOT corporate SaaS. Think: mission control for human health
+- Typography: Monospace for data/scores (JetBrains Mono), clean serif for headings (Playfair Display), modern sans for body
+- Animations: Smooth data loading pulses, risk gauge fills, scan upload progress indicators
+
+---
+
+### PAGES & FEATURES
+
+#### 1. 🏠 Dashboard (Main View)
+- Live stats: total patients screened, high-risk flags, pending reviews, model accuracy %
+- Risk distribution chart (donut) — Low / Moderate / High / Critical
+- Recent screening activity feed
+- Top 5 high-risk patients with quick-action buttons
+
+#### 2. 👤 Patient Screening Workflow (Multi-Step Form)
+Step 1 — Demographics: Age, sex, ethnicity, family history, smoking/lifestyle factors  
+Step 2 — Biomarker Input: Upload blood panel CSV or manual entry (PSA, CEA, CA-125, AFP, etc.)  
+Step 3 — Medical Imaging: Drag-and-drop upload (MRI/CT/X-ray) with thumbnail preview  
+Step 4 — AI Analysis: Animated "analyzing" state → risk score output with confidence %  
+Step 5 — Report: Printable PDF summary with recommendations  
+
+#### 3. 📊 Risk Prediction Dashboard
+- Patient list with sortable risk scores (0–100)
+- Color-coded risk bands: Green (0-25), Yellow (26-50), Orange (51-75), Red (76-100)
+- Individual patient drill-down: risk breakdown by category (genetic, lifestyle, biomarker, imaging)
+- Trend chart: risk score over time per patient
+- Export to CSV/PDF
+
+#### 4. 📈 Model Accuracy Report
+- Accuracy, Precision, Recall, F1-Score, AUC-ROC displayed as animated metric cards
+- Confusion matrix heatmap visualization
+- ROC Curve chart (using Recharts)
+- Comparison table: AI model vs traditional screening methods
+- Version history of model updates
+
+#### 5. 🏥 Clinical Validation Framework
+- Protocol documentation viewer
+- Validation study results table (institution, sample size, accuracy, date)
+- IRB approval status tracker
+- Bias audit section: performance across demographic groups
+- Regulatory compliance checklist (FDA, CE Mark, HIPAA)
+
+---
+
+### TECHNICAL REQUIREMENTS
+- React with hooks (useState, useEffect, useReducer)
+- Recharts for all data visualizations
+- Tailwind CSS utility classes only (no custom CSS files)
+- Lucide React for icons
+- All data should be realistic mock/simulated data (no real API calls needed)
+- Fully responsive (mobile + desktop)
+- Single-page app with tab/sidebar navigation
+- Accessible (ARIA labels, keyboard navigation)
+
+---
+
+### MOCK DATA TO INCLUDE
+- 15–20 mock patients with varied risk profiles
+- Realistic biomarker values
+- Model metrics: ~91% accuracy, 0.94 AUC-ROC
+- 3 validation studies from different institutions
+
+---
+
+### KEY UI COMPONENTS
+- `<RiskGauge />` — animated radial gauge showing 0–100 risk score
+- `<PatientCard />` — compact card with name, risk badge, last screened date
+- `<BiomarkerTable />` — color-coded table flagging abnormal values
+- `<ScreeningWizard />` — multi-step form with progress bar
+- `<ModelMetricCard />` — animated number counter for accuracy stats
+
+---
+
+### WHAT MAKES IT UNFORGETTABLE
+A full-screen "ANALYZING PATIENT" overlay with a DNA helix animation and real-time scanning effect when the AI processes a new patient — building tension before revealing the risk score with a dramatic gauge fill animation.
+```
+
+---
+
+This prompt gives an AI coding tool everything it needs: design direction, feature specs, component breakdown, mock data requirements, and a memorable hero interaction. Paste it directly into Claude, Cursor, v0, or Bolt to generate the full app.

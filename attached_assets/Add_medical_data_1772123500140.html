@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>OncoGuard AI — Add Medical Data</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet" />
+    <script>
+        tailwind.config = { darkMode: "class", theme: { extend: { colors: { "primary": "#137fec", "background-light": "#f6f7f8" }, fontFamily: { "display": ["Inter", "sans-serif"] } } } }
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            min-height: 100dvh
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(8px)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0)
+            }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.4s ease forwards;
+            opacity: 0
+        }
+
+        .delay-1 {
+            animation-delay: 0.1s
+        }
+
+        .delay-2 {
+            animation-delay: 0.2s
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0)
+            }
+        }
+
+        .toast-anim {
+            animation: slideUp 0.3s ease
+        }
+    </style>
+</head>
+
+<body class="bg-background-light font-display text-slate-900 min-h-screen flex flex-col">
+    <script src="js/auth.js"></script>
+    <script>requireAuth();</script>
+
+    <header class="sticky top-0 z-10 bg-white/90 backdrop-blur-md border-b border-slate-200">
+        <div class="max-w-2xl mx-auto flex items-center justify-between p-4">
+            <a href="Clinical validation framwork.html"
+                class="flex items-center gap-2 text-primary hover:underline text-sm font-semibold">
+                <span class="material-symbols-outlined text-lg">arrow_back</span> Validation
+            </a>
+            <h1 class="text-lg font-bold tracking-tight">Add Data</h1>
+            <button onclick="logout()"
+                class="text-xs text-slate-400 hover:text-red-500 transition flex items-center gap-1">
+                <span class="material-symbols-outlined text-sm">logout</span>
+            </button>
+        </div>
+    </header>
+
+    <main class="flex-1 max-w-2xl mx-auto w-full px-4 py-6 pb-28 space-y-6">
+        <!-- Saved Entries -->
+        <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-5 fade-in">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="font-bold flex items-center gap-2"><span
+                        class="material-symbols-outlined text-primary">folder_open</span>Saved Records</h3>
+                <span class="text-xs font-bold text-primary" id="recordCount">0 records</span>
+            </div>
+            <div id="savedList" class="space-y-2"></div>
+        </div>
+
+        <!-- Add New -->
+        <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden fade-in delay-1">
+            <div class="bg-primary/5 p-4 border-b border-primary/10 flex items-center gap-2">
+                <span class="material-symbols-outlined text-primary">add_circle</span>
+                <h3 class="font-bold">New Medical Record Entry</h3>
+            </div>
+            <form id="addForm" onsubmit="return saveRecord(event)" class="p-5 space-y-5">
+                <!-- Record Type -->
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-1.5">Record Type *</label>
+                    <select id="recType" required
+                        class="w-full rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm focus:ring-2 focus:ring-primary outline-none">
+                        <option value="">Select type...</option>
+                        <option value="Lab Result">Lab Result</option>
+                        <option value="Imaging Report">Imaging Report</option>
+                        <option value="Biopsy">Biopsy Result</option>
+                        <option value="Biomarker">Biomarker Level</option>
+                        <option value="Pathology">Pathology Report</option>
+                        <option value="Prescription">Prescription</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+
+                <!-- Title -->
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-1.5">Title / Description *</label>
+                    <input id="recTitle" required type="text" placeholder="e.g. Complete Blood Count — Jan 2026"
+                        class="w-full rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm focus:ring-2 focus:ring-primary outline-none" />
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <!-- Date -->
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-1.5">Date *</label>
+                        <input id="recDate" required type="date"
+                            class="w-full rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm focus:ring-2 focus:ring-primary outline-none" />
+                    </div>
+                    <!-- Facility -->
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-1.5">Facility</label>
+                        <input id="recFacility" type="text" placeholder="Hospital name"
+                            class="w-full rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm focus:ring-2 focus:ring-primary outline-none" />
+                    </div>
+                </div>
+
+                <!-- Values -->
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-1.5">Values / Results</label>
+                    <textarea id="recValues" rows="3" placeholder="Enter test values, results, or paste report text..."
+                        class="w-full rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm focus:ring-2 focus:ring-primary outline-none"></textarea>
+                </div>
+
+                <!-- Notes -->
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-1.5">Clinical Notes</label>
+                    <textarea id="recNotes" rows="2" placeholder="Optional physician notes..."
+                        class="w-full rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm focus:ring-2 focus:ring-primary outline-none"></textarea>
+                </div>
+
+                <!-- Priority -->
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-2">Priority Level</label>
+                    <div class="flex gap-3">
+                        <label
+                            class="flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg border border-slate-200 cursor-pointer hover:bg-slate-50 transition text-sm has-[:checked]:border-green-500 has-[:checked]:bg-green-50 has-[:checked]:text-green-700">
+                            <input type="radio" name="priority" value="Normal" checked class="sr-only" /> Normal
+                        </label>
+                        <label
+                            class="flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg border border-slate-200 cursor-pointer hover:bg-slate-50 transition text-sm has-[:checked]:border-amber-500 has-[:checked]:bg-amber-50 has-[:checked]:text-amber-700">
+                            <input type="radio" name="priority" value="Urgent" class="sr-only" /> Urgent
+                        </label>
+                        <label
+                            class="flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg border border-slate-200 cursor-pointer hover:bg-slate-50 transition text-sm has-[:checked]:border-red-500 has-[:checked]:bg-red-50 has-[:checked]:text-red-700">
+                            <input type="radio" name="priority" value="Critical" class="sr-only" /> Critical
+                        </label>
+                    </div>
+                </div>
+
+                <button type="submit"
+                    class="w-full bg-primary text-white font-bold py-3.5 rounded-xl hover:bg-primary/90 transition shadow-lg shadow-primary/20 flex items-center justify-center gap-2">
+                    <span class="material-symbols-outlined text-lg">save</span> Save Record
+                </button>
+            </form>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="grid grid-cols-2 gap-3 fade-in delay-2">
+            <a href="screeing step1.html"
+                class="bg-white rounded-xl border border-slate-200 shadow-sm p-4 hover:border-primary transition flex items-center gap-3">
+                <span class="material-symbols-outlined text-primary">assignment_ind</span>
+                <div>
+                    <p class="font-semibold text-sm">New Screening</p>
+                    <p class="text-xs text-slate-400">Start fresh</p>
+                </div>
+            </a>
+            <a href="risk prediction dashboard.html"
+                class="bg-white rounded-xl border border-slate-200 shadow-sm p-4 hover:border-primary transition flex items-center gap-3">
+                <span class="material-symbols-outlined text-primary">dashboard</span>
+                <div>
+                    <p class="font-semibold text-sm">Dashboard</p>
+                    <p class="text-xs text-slate-400">View results</p>
+                </div>
+            </a>
+        </div>
+    </main>
+
+    <!-- Bottom Nav -->
+    <nav class="fixed bottom-0 left-0 right-0 border-t border-slate-200 bg-white/90 backdrop-blur-md pb-6 pt-2 px-4">
+        <div class="max-w-2xl mx-auto flex justify-around items-center">
+            <a class="flex flex-col items-center gap-1 text-slate-400 hover:text-primary transition"
+                href="risk prediction dashboard.html">
+                <span class="material-symbols-outlined">dashboard</span><span
+                    class="text-[10px] font-bold">Dashboard</span>
+            </a>
+            <a class="flex flex-col items-center gap-1 text-slate-400 hover:text-primary transition"
+                href="model accuracy report.html">
+                <span class="material-symbols-outlined">analytics</span><span
+                    class="text-[10px] font-bold">Reports</span>
+            </a>
+            <a class="flex flex-col items-center gap-1 text-slate-400 hover:text-primary transition"
+                href="Clinical validation framwork.html">
+                <span class="material-symbols-outlined">fact_check</span><span
+                    class="text-[10px] font-bold">Validation</span>
+            </a>
+            <a class="flex flex-col items-center gap-1 text-primary" href="Add medical data.html">
+                <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1">add_circle</span><span
+                    class="text-[10px] font-bold">Add Data</span>
+            </a>
+        </div>
+    </nav>
+
+    <!-- Toast -->
+    <div id="toast"
+        class="fixed top-6 left-1/2 -translate-x-1/2 z-50 hidden bg-green-600 text-white px-6 py-3 rounded-xl shadow-lg font-semibold text-sm flex items-center gap-2 toast-anim">
+        <span class="material-symbols-outlined text-lg">check_circle</span><span id="toastText">Saved</span>
+    </div>
+
+    <script>
+        const STORAGE_KEY = 'medical_data';
+
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            document.getElementById('toastText').textContent = msg;
+            t.classList.remove('hidden');
+            setTimeout(() => t.classList.add('hidden'), 2500);
+        }
+
+        function loadRecords() {
+            const records = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+            document.getElementById('recordCount').textContent = records.length + ' record' + (records.length !== 1 ? 's' : '');
+            if (records.length === 0) {
+                document.getElementById('savedList').innerHTML = '<p class="text-sm text-slate-400 italic text-center py-4">No records added yet. Use the form below to add data.</p>';
+                return;
+            }
+            const priorityColors = { Normal: '#10b981', Urgent: '#f59e0b', Critical: '#ef4444' };
+            const typeIcons = { 'Lab Result': 'biotech', 'Imaging Report': 'radiology', 'Biopsy': 'microscope', 'Biomarker': 'science', 'Pathology': 'labs', 'Prescription': 'medication', 'Other': 'description' };
+            document.getElementById('savedList').innerHTML = records.map((r, i) => `
+                <div class="flex items-start gap-3 p-3 bg-slate-50 rounded-lg border border-slate-100 hover:border-primary/30 transition">
+                    <div class="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center shrink-0">
+                        <span class="material-symbols-outlined text-primary text-lg">${typeIcons[r.type] || 'description'}</span>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center gap-2 mb-0.5">
+                            <p class="font-semibold text-sm truncate">${r.title}</p>
+                            <span class="text-[10px] font-bold px-1.5 py-0.5 rounded" style="background:${priorityColors[r.priority]}20;color:${priorityColors[r.priority]}">${r.priority}</span>
+                        </div>
+                        <p class="text-xs text-slate-500">${r.type} • ${r.date}${r.facility ? ' • ' + r.facility : ''}</p>
+                        ${r.values ? `<p class="text-xs text-slate-600 mt-1 truncate">${r.values}</p>` : ''}
+                    </div>
+                    <button onclick="deleteRecord(${i})" class="text-slate-300 hover:text-red-500 transition shrink-0">
+                        <span class="material-symbols-outlined text-sm">delete</span>
+                    </button>
+                </div>
+            `).join('');
+        }
+        loadRecords();
+
+        function saveRecord(e) {
+            e.preventDefault();
+            const records = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+            const priorityEl = document.querySelector('input[name="priority"]:checked');
+            records.unshift({
+                type: document.getElementById('recType').value,
+                title: document.getElementById('recTitle').value.trim(),
+                date: document.getElementById('recDate').value,
+                facility: document.getElementById('recFacility').value.trim(),
+                values: document.getElementById('recValues').value.trim(),
+                notes: document.getElementById('recNotes').value.trim(),
+                priority: priorityEl ? priorityEl.value : 'Normal',
+                timestamp: Date.now(),
+            });
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
+            document.getElementById('addForm').reset();
+            loadRecords();
+            showToast('Medical record saved successfully!');
+            return false;
+        }
+
+        function deleteRecord(idx) {
+            if (!confirm('Delete this record?')) return;
+            const records = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+            records.splice(idx, 1);
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
+            loadRecords();
+            showToast('Record deleted');
+        }
+    </script>
+</body>
+
+</html>

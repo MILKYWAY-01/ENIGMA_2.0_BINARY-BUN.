@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>OncoGuard AI - Step 1: Patient Information</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet" />
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: { "primary": "#137fec", "background-light": "#f6f7f8", "background-dark": "#101922" },
+                    fontFamily: { "display": ["Inter"] },
+                    borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" },
+                },
+            },
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            min-height: 100dvh;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(8px)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0)
+            }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.4s ease forwards;
+        }
+
+        .field-error {
+            border-color: #ef4444 !important;
+        }
+    </style>
+</head>
+
+<body
+    class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 min-h-screen flex flex-col">
+    <script src="js/auth.js"></script>
+    <script>requireAuth();</script>
+
+    <!-- Header -->
+    <header
+        class="sticky top-0 z-10 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-800">
+        <div class="max-w-2xl mx-auto flex items-center justify-between p-4">
+            <a href="LoginScreen.html"
+                class="flex items-center gap-2 text-primary hover:underline text-sm font-semibold">
+                <span class="material-symbols-outlined text-lg">arrow_back</span> Back
+            </a>
+            <h1 class="text-lg font-bold tracking-tight">Patient Screening</h1>
+            <button onclick="logout()"
+                class="text-xs text-slate-400 hover:text-red-500 transition-colors flex items-center gap-1">
+                <span class="material-symbols-outlined text-sm">logout</span> Logout
+            </button>
+        </div>
+    </header>
+
+    <!-- Progress -->
+    <div class="max-w-2xl mx-auto w-full px-4 pt-6 pb-2">
+        <div class="flex items-center justify-between text-xs text-slate-400 mb-2">
+            <span class="font-bold text-primary">Step 1 of 4 — Patient Information</span>
+            <span>25%</span>
+        </div>
+        <div class="flex gap-2">
+            <div class="flex-1 h-2 rounded-full bg-primary"></div>
+            <div class="flex-1 h-2 rounded-full bg-slate-200 dark:bg-slate-700"></div>
+            <div class="flex-1 h-2 rounded-full bg-slate-200 dark:bg-slate-700"></div>
+            <div class="flex-1 h-2 rounded-full bg-slate-200 dark:bg-slate-700"></div>
+        </div>
+    </div>
+
+    <!-- Form -->
+    <main class="flex-1 max-w-2xl mx-auto w-full px-4 py-6">
+        <div
+            class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden fade-in">
+            <div class="p-6 border-b border-slate-100 dark:border-slate-800">
+                <h2 class="text-xl font-bold flex items-center gap-2">
+                    <span class="material-symbols-outlined text-primary">person</span>
+                    Basic Patient Information
+                </h2>
+                <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">All fields marked with * are required.</p>
+            </div>
+
+            <form id="step1Form" class="p-6 space-y-5" onsubmit="return saveAndNext(event)">
+                <!-- Full Name -->
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Full Name
+                        *</label>
+                    <input id="fullName" name="fullName" required
+                        class="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-4 py-3 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition"
+                        placeholder="Jonathan K. Richards" type="text" />
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                    <!-- Age -->
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Age
+                            *</label>
+                        <input id="age" name="age" required min="1" max="120"
+                            class="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-4 py-3 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition"
+                            placeholder="52" type="number" />
+                    </div>
+                    <!-- Gender -->
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Gender
+                            *</label>
+                        <select id="gender" name="gender" required
+                            class="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-4 py-3 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition">
+                            <option value="">Select Gender</option>
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                            <option value="Non-binary">Non-binary</option>
+                            <option value="Prefer not to say">Prefer not to say</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Date of Birth -->
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Date of Birth
+                        *</label>
+                    <input id="dob" name="dob" required
+                        class="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-4 py-3 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition"
+                        type="date" />
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                    <!-- Contact Number -->
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Contact
+                            Number *</label>
+                        <input id="contactNumber" name="contactNumber" required
+                            class="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-4 py-3 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition"
+                            placeholder="+1 (555) 123-4567" type="tel" />
+                    </div>
+                    <!-- Email -->
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Email
+                            *</label>
+                        <input id="email" name="email" required
+                            class="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-4 py-3 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition"
+                            placeholder="patient@example.com" type="email" />
+                    </div>
+                </div>
+
+                <!-- Emergency Contact -->
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Emergency
+                        Contact *</label>
+                    <input id="emergencyContact" name="emergencyContact" required
+                        class="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-4 py-3 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition"
+                        placeholder="Name — Phone" type="text" />
+                </div>
+
+                <!-- Buttons -->
+                <div class="flex gap-4 pt-4">
+                    <a href="LoginScreen.html"
+                        class="flex-1 py-3 rounded-xl border border-slate-200 dark:border-slate-700 font-semibold text-slate-600 dark:text-slate-300 text-center hover:bg-slate-50 dark:hover:bg-slate-800 transition">
+                        Cancel
+                    </a>
+                    <button type="submit"
+                        class="flex-[2] py-3 rounded-xl bg-primary text-white font-bold shadow-lg shadow-primary/20 hover:bg-primary/90 transition flex items-center justify-center gap-2">
+                        Save & Continue
+                        <span class="material-symbols-outlined text-lg">arrow_forward</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    <script>
+        // Pre-fill from localStorage if data exists
+        (function loadSaved() {
+            const saved = localStorage.getItem('screening_step1');
+            if (!saved) return;
+            try {
+                const data = JSON.parse(saved);
+                document.getElementById('fullName').value = data.fullName || '';
+                document.getElementById('age').value = data.age || '';
+                document.getElementById('gender').value = data.gender || '';
+                document.getElementById('dob').value = data.dob || '';
+                document.getElementById('contactNumber').value = data.contactNumber || '';
+                document.getElementById('email').value = data.email || '';
+                document.getElementById('emergencyContact').value = data.emergencyContact || '';
+            } catch (e) { }
+        })();
+
+        function saveAndNext(e) {
+            e.preventDefault();
+            const data = {
+                fullName: document.getElementById('fullName').value.trim(),
+                age: document.getElementById('age').value,
+                gender: document.getElementById('gender').value,
+                dob: document.getElementById('dob').value,
+                contactNumber: document.getElementById('contactNumber').value.trim(),
+                email: document.getElementById('email').value.trim(),
+                emergencyContact: document.getElementById('emergencyContact').value.trim(),
+            };
+            localStorage.setItem('screening_step1', JSON.stringify(data));
+            window.location.href = 'lifestyle Assessment.html';
+            return false;
+        }
+    </script>
+</body>
+
+</html>

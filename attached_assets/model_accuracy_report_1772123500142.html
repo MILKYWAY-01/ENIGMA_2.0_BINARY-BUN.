@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>OncoGuard AI — Model Accuracy Report</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet" />
+    <script>
+        tailwind.config = { darkMode: "class", theme: { extend: { colors: { "primary": "#137fec", "background-light": "#f6f7f8" }, fontFamily: { "display": ["Inter", "sans-serif"] } } } }
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            min-height: 100dvh
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(8px)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0)
+            }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.4s ease forwards;
+            opacity: 0
+        }
+
+        .delay-1 {
+            animation-delay: 0.1s
+        }
+
+        .delay-2 {
+            animation-delay: 0.2s
+        }
+
+        .delay-3 {
+            animation-delay: 0.3s
+        }
+
+        @keyframes grow {
+            from {
+                width: 0
+            }
+        }
+
+        .bar-animate {
+            animation: grow 1.2s ease forwards
+        }
+    </style>
+</head>
+
+<body class="bg-background-light font-display text-slate-900 min-h-screen flex flex-col">
+    <script src="js/auth.js"></script>
+    <script>requireAuth();</script>
+
+    <header class="sticky top-0 z-10 bg-white/90 backdrop-blur-md border-b border-slate-200">
+        <div class="max-w-2xl mx-auto flex items-center justify-between p-4">
+            <a href="risk prediction dashboard.html"
+                class="flex items-center gap-2 text-primary hover:underline text-sm font-semibold">
+                <span class="material-symbols-outlined text-lg">arrow_back</span> Dashboard
+            </a>
+            <h1 class="text-lg font-bold tracking-tight">Model Report</h1>
+            <button onclick="logout()"
+                class="text-xs text-slate-400 hover:text-red-500 transition flex items-center gap-1">
+                <span class="material-symbols-outlined text-sm">logout</span>
+            </button>
+        </div>
+    </header>
+
+    <main class="flex-1 max-w-2xl mx-auto w-full px-4 py-6 pb-28 space-y-6">
+        <!-- Model Info -->
+        <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-5 fade-in">
+            <div class="flex items-center gap-3 mb-4">
+                <div class="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
+                    <span class="material-symbols-outlined text-primary">psychology</span>
+                </div>
+                <div>
+                    <h2 class="font-bold">OncoGuard Diagnostics v2.4</h2>
+                    <p class="text-xs text-slate-400">Multi-modal cancer risk classification</p>
+                </div>
+            </div>
+            <div class="grid grid-cols-3 gap-3 text-center">
+                <div class="bg-slate-50 rounded-lg p-3">
+                    <p class="text-2xl font-extrabold text-primary">98.4%</p>
+                    <p class="text-[10px] text-slate-400 font-bold uppercase mt-1">Accuracy</p>
+                </div>
+                <div class="bg-slate-50 rounded-lg p-3">
+                    <p class="text-2xl font-extrabold text-primary">96.7%</p>
+                    <p class="text-[10px] text-slate-400 font-bold uppercase mt-1">Sensitivity</p>
+                </div>
+                <div class="bg-slate-50 rounded-lg p-3">
+                    <p class="text-2xl font-extrabold text-primary">99.1%</p>
+                    <p class="text-[10px] text-slate-400 font-bold uppercase mt-1">Specificity</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Performance Bars -->
+        <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-5 fade-in delay-1">
+            <h3 class="font-bold mb-4 flex items-center gap-2"><span
+                    class="material-symbols-outlined text-primary text-lg">bar_chart</span>Performance by Cancer Type
+            </h3>
+            <div class="space-y-4" id="perfBars"></div>
+        </div>
+
+        <!-- Confusion Matrix -->
+        <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-5 fade-in delay-2">
+            <h3 class="font-bold mb-4 flex items-center gap-2"><span
+                    class="material-symbols-outlined text-primary text-lg">grid_on</span>Confusion Matrix</h3>
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm">
+                    <thead>
+                        <tr class="bg-slate-50">
+                            <th class="p-2 text-left text-xs text-slate-400">Actual \ Predicted</th>
+                            <th class="p-2 text-center text-xs">Positive</th>
+                            <th class="p-2 text-center text-xs">Negative</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="border-t border-slate-100">
+                            <td class="p-2 font-semibold text-xs">Positive</td>
+                            <td class="p-2 text-center"><span
+                                    class="bg-green-50 text-green-700 font-bold px-2 py-1 rounded" id="tp">4,280</span>
+                            </td>
+                            <td class="p-2 text-center"><span class="bg-red-50 text-red-600 font-bold px-2 py-1 rounded"
+                                    id="fn">145</span></td>
+                        </tr>
+                        <tr class="border-t border-slate-100">
+                            <td class="p-2 font-semibold text-xs">Negative</td>
+                            <td class="p-2 text-center"><span class="bg-red-50 text-red-600 font-bold px-2 py-1 rounded"
+                                    id="fp">39</span></td>
+                            <td class="p-2 text-center"><span
+                                    class="bg-green-50 text-green-700 font-bold px-2 py-1 rounded" id="tn">4,536</span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Training Stats -->
+        <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-5 fade-in delay-3">
+            <h3 class="font-bold mb-4 flex items-center gap-2"><span
+                    class="material-symbols-outlined text-primary text-lg">storage</span>Training Data</h3>
+            <div class="grid grid-cols-2 gap-4">
+                <div class="bg-slate-50 rounded-lg p-4 text-center">
+                    <p class="text-sm text-slate-500">Total Samples</p>
+                    <p class="text-xl font-extrabold mt-1">47,892</p>
+                </div>
+                <div class="bg-slate-50 rounded-lg p-4 text-center">
+                    <p class="text-sm text-slate-500">Features Used</p>
+                    <p class="text-xl font-extrabold mt-1">234</p>
+                </div>
+                <div class="bg-slate-50 rounded-lg p-4 text-center">
+                    <p class="text-sm text-slate-500">Training Time</p>
+                    <p class="text-xl font-extrabold mt-1">14.2h</p>
+                </div>
+                <div class="bg-slate-50 rounded-lg p-4 text-center">
+                    <p class="text-sm text-slate-500">Last Updated</p>
+                    <p class="text-xl font-extrabold mt-1">Feb 2026</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Version History -->
+        <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-5">
+            <h3 class="font-bold mb-4 flex items-center gap-2"><span
+                    class="material-symbols-outlined text-primary text-lg">history</span>Version History</h3>
+            <div class="space-y-3" id="versionHistory"></div>
+        </div>
+
+        <!-- Screening Count -->
+        <div class="bg-primary/5 border-2 border-dashed border-primary/30 rounded-xl p-5 text-center">
+            <p class="text-sm text-slate-600">Total screenings run on this device</p>
+            <p class="text-4xl font-extrabold text-primary mt-2" id="screeningCount">0</p>
+            <p class="text-xs text-slate-400 mt-1">Data persisted in local storage</p>
+        </div>
+    </main>
+
+    <!-- Bottom Nav -->
+    <nav class="fixed bottom-0 left-0 right-0 border-t border-slate-200 bg-white/90 backdrop-blur-md pb-6 pt-2 px-4">
+        <div class="max-w-2xl mx-auto flex justify-around items-center">
+            <a class="flex flex-col items-center gap-1 text-slate-400 hover:text-primary transition"
+                href="risk prediction dashboard.html">
+                <span class="material-symbols-outlined">dashboard</span><span
+                    class="text-[10px] font-bold">Dashboard</span>
+            </a>
+            <a class="flex flex-col items-center gap-1 text-primary" href="model accuracy report.html">
+                <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1">analytics</span><span
+                    class="text-[10px] font-bold">Reports</span>
+            </a>
+            <a class="flex flex-col items-center gap-1 text-slate-400 hover:text-primary transition"
+                href="Clinical validation framwork.html">
+                <span class="material-symbols-outlined">fact_check</span><span
+                    class="text-[10px] font-bold">Validation</span>
+            </a>
+            <a class="flex flex-col items-center gap-1 text-slate-400 hover:text-primary transition"
+                href="Add medical data.html">
+                <span class="material-symbols-outlined">add_circle</span><span class="text-[10px] font-bold">Add
+                    Data</span>
+            </a>
+        </div>
+    </nav>
+
+    <script>
+        // Performance bars
+        const cancers = [
+            { name: 'Breast Cancer', acc: 99.2, color: '#ec4899' },
+            { name: 'Lung Cancer', acc: 97.8, color: '#6366f1' },
+            { name: 'Colorectal', acc: 98.1, color: '#f59e0b' },
+            { name: 'Prostate', acc: 98.9, color: '#10b981' },
+            { name: 'Skin Melanoma', acc: 96.4, color: '#f97316' },
+            { name: 'Liver Cancer', acc: 97.2, color: '#ef4444' },
+        ];
+        document.getElementById('perfBars').innerHTML = cancers.map(c => `
+            <div>
+                <div class="flex justify-between items-center mb-1">
+                    <span class="text-sm font-medium">${c.name}</span>
+                    <span class="text-sm font-bold" style="color:${c.color}">${c.acc}%</span>
+                </div>
+                <div class="w-full h-2.5 bg-slate-100 rounded-full overflow-hidden">
+                    <div class="h-full rounded-full bar-animate" style="width:${c.acc}%;background:${c.color}"></div>
+                </div>
+            </div>
+        `).join('');
+
+        // Version history
+        const versions = [
+            { v: 'v2.4', date: 'Feb 2026', change: 'Added lifestyle factor weighting, +0.3% accuracy', badge: 'CURRENT' },
+            { v: 'v2.3', date: 'Dec 2025', change: 'Improved sensitivity for lung cancer detection', badge: '' },
+            { v: 'v2.2', date: 'Oct 2025', change: 'Added symptom correlation analysis', badge: '' },
+            { v: 'v2.1', date: 'Jul 2025', change: 'Initial multi-modal fusion model release', badge: '' },
+        ];
+        document.getElementById('versionHistory').innerHTML = versions.map(v => `
+            <div class="flex items-start gap-3 relative pl-6 before:absolute before:left-[7px] before:top-3 before:w-0.5 before:h-full before:bg-slate-100 last:before:hidden">
+                <div class="absolute left-0 top-1.5 w-3.5 h-3.5 rounded-full ${v.badge ? 'bg-primary' : 'bg-slate-200'} border-2 border-white"></div>
+                <div class="flex-1">
+                    <div class="flex items-center gap-2">
+                        <span class="font-bold text-sm">${v.v}</span>
+                        ${v.badge ? `<span class="px-1.5 py-0.5 bg-primary/10 text-primary text-[10px] font-bold rounded">${v.badge}</span>` : ''}
+                        <span class="text-xs text-slate-400 ml-auto">${v.date}</span>
+                    </div>
+                    <p class="text-xs text-slate-500 mt-0.5">${v.change}</p>
+                </div>
+            </div>
+        `).join('');
+
+        // Count screenings
+        let count = parseInt(localStorage.getItem('screening_count') || '0');
+        if (localStorage.getItem('screening_step1')) {
+            const lastCounted = localStorage.getItem('screening_last_counted');
+            const s1 = localStorage.getItem('screening_step1');
+            if (lastCounted !== s1) {
+                count++;
+                localStorage.setItem('screening_count', count);
+                localStorage.setItem('screening_last_counted', s1);
+            }
+        }
+        document.getElementById('screeningCount').textContent = count;
+    </script>
+</body>
+
+</html>

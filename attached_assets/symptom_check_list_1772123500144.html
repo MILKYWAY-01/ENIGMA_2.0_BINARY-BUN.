@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>OncoGuard AI - Step 3: Symptom Checklist</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet" />
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: { "primary": "#137fec", "background-light": "#f6f7f8", "background-dark": "#101922" },
+                    fontFamily: { "display": ["Inter", "sans-serif"] },
+                    borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" },
+                },
+            },
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            min-height: 100dvh;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(8px)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0)
+            }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.4s ease forwards;
+        }
+
+        .symptom-card {
+            transition: all 0.2s ease;
+        }
+
+        .symptom-card:has(input:checked) {
+            border-color: #137fec;
+            background: rgba(19, 127, 236, 0.06);
+        }
+
+        .symptom-card:has(input:checked) .symptom-icon {
+            color: #137fec;
+        }
+    </style>
+</head>
+
+<body
+    class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 min-h-screen flex flex-col">
+    <script src="js/auth.js"></script>
+    <script>requireAuth();</script>
+
+    <!-- Header -->
+    <header
+        class="sticky top-0 z-10 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-800">
+        <div class="max-w-2xl mx-auto flex items-center justify-between p-4">
+            <a href="lifestyle Assessment.html"
+                class="flex items-center gap-2 text-primary hover:underline text-sm font-semibold">
+                <span class="material-symbols-outlined text-lg">arrow_back</span> Back
+            </a>
+            <h1 class="text-lg font-bold tracking-tight">Symptom Checklist</h1>
+            <button onclick="logout()"
+                class="text-xs text-slate-400 hover:text-red-500 transition-colors flex items-center gap-1">
+                <span class="material-symbols-outlined text-sm">logout</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Progress -->
+    <div class="max-w-2xl mx-auto w-full px-4 pt-6 pb-2">
+        <div class="flex items-center justify-between text-xs text-slate-400 mb-2">
+            <span class="font-bold text-primary">Step 3 of 4 — Symptom Checklist</span>
+            <span>75%</span>
+        </div>
+        <div class="flex gap-2">
+            <div class="flex-1 h-2 rounded-full bg-primary"></div>
+            <div class="flex-1 h-2 rounded-full bg-primary"></div>
+            <div class="flex-1 h-2 rounded-full bg-primary"></div>
+            <div class="flex-1 h-2 rounded-full bg-slate-200 dark:bg-slate-700"></div>
+        </div>
+    </div>
+
+    <!-- Checklist -->
+    <main class="flex-1 max-w-2xl mx-auto w-full px-4 py-6 pb-28">
+        <div
+            class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden fade-in">
+            <div class="p-6 border-b border-slate-100 dark:border-slate-800">
+                <h2 class="text-xl font-bold flex items-center gap-2">
+                    <span class="material-symbols-outlined text-primary">checklist</span>
+                    Early Warning Signs
+                </h2>
+                <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Select any symptoms you've experienced
+                    recently. Check all that apply.</p>
+            </div>
+            <div class="p-4 space-y-2" id="symptomList">
+                <!-- Symptoms injected by JS -->
+            </div>
+
+            <!-- Other symptoms -->
+            <div class="p-6 border-t border-slate-100 dark:border-slate-800">
+                <label class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Other symptoms (free
+                    text)</label>
+                <textarea id="otherSymptoms" rows="3"
+                    class="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-4 py-3 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition text-sm"
+                    placeholder="Describe any other symptoms not listed above..."></textarea>
+            </div>
+
+            <!-- Selected count -->
+            <div class="p-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
+                <div class="flex items-center gap-2 text-sm">
+                    <span class="material-symbols-outlined text-primary text-lg">info</span>
+                    <span class="text-slate-500 dark:text-slate-400"><strong id="selectedCount"
+                            class="text-primary">0</strong> symptom(s) selected</span>
+                </div>
+                <p class="text-[10px] text-slate-400 uppercase tracking-wider">HIPAA Compliant</p>
+            </div>
+        </div>
+    </main>
+
+    <!-- Sticky Footer -->
+    <footer
+        class="fixed bottom-0 left-0 right-0 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-t border-slate-200 dark:border-slate-800">
+        <div class="max-w-2xl mx-auto p-4 flex gap-4">
+            <a href="lifestyle Assessment.html"
+                class="flex-1 py-3 rounded-xl border border-slate-200 dark:border-slate-700 font-semibold text-slate-600 dark:text-slate-300 text-center hover:bg-slate-50 dark:hover:bg-slate-800 transition">
+                Back
+            </a>
+            <button onclick="saveAndNext()"
+                class="flex-[2] py-3 rounded-xl bg-primary text-white font-bold shadow-lg shadow-primary/20 hover:bg-primary/90 transition flex items-center justify-center gap-2">
+                Continue to Summary
+                <span class="material-symbols-outlined text-lg">arrow_forward</span>
+            </button>
+        </div>
+    </footer>
+
+    <script>
+        const SYMPTOMS = [
+            { id: 'fatigue', label: 'Fatigue', desc: 'Persistent tiredness or exhaustion', icon: 'battery_alert' },
+            { id: 'headache', label: 'Headache', desc: 'Frequent or severe headaches', icon: 'psychology_alt' },
+            { id: 'chest_pain', label: 'Chest Pain', desc: 'Pain or pressure in the chest area', icon: 'cardiology' },
+            { id: 'shortness_of_breath', label: 'Shortness of Breath', desc: 'Difficulty breathing at rest or exertion', icon: 'pulmonology' },
+            { id: 'dizziness', label: 'Dizziness', desc: 'Lightheadedness or vertigo', icon: 'blur_on' },
+            { id: 'nausea', label: 'Nausea', desc: 'Feeling of sickness or urge to vomit', icon: 'sick' },
+            { id: 'joint_pain', label: 'Joint Pain', desc: 'Aches in joints or muscles', icon: 'accessibility_new' },
+            { id: 'fever', label: 'Fever', desc: 'Elevated body temperature', icon: 'thermometer' },
+            { id: 'weight_changes', label: 'Weight Changes', desc: 'Unexplained weight loss or gain', icon: 'monitor_weight' },
+            { id: 'mood_changes', label: 'Mood Changes', desc: 'Anxiety, depression, or irritability', icon: 'mood' },
+        ];
+
+        const list = document.getElementById('symptomList');
+        SYMPTOMS.forEach(s => {
+            list.innerHTML += `
+                <label class="symptom-card flex items-center gap-4 p-4 rounded-xl border border-slate-100 dark:border-slate-800 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/50">
+                    <input class="h-5 w-5 rounded text-primary focus:ring-primary border-slate-300 dark:border-slate-600 symptom-cb" type="checkbox" value="${s.id}" onchange="updateCount()" />
+                    <span class="material-symbols-outlined symptom-icon text-slate-400 text-2xl">${s.icon}</span>
+                    <div class="flex-1">
+                        <p class="text-sm font-semibold">${s.label}</p>
+                        <p class="text-xs text-slate-400 dark:text-slate-500">${s.desc}</p>
+                    </div>
+                </label>`;
+        });
+
+        function updateCount() {
+            document.getElementById('selectedCount').textContent = document.querySelectorAll('.symptom-cb:checked').length;
+        }
+
+        // Pre-fill
+        (function loadSaved() {
+            const saved = localStorage.getItem('screening_step3');
+            if (!saved) return;
+            try {
+                const d = JSON.parse(saved);
+                if (d.symptoms) d.symptoms.forEach(id => {
+                    const cb = document.querySelector(`.symptom-cb[value="${id}"]`);
+                    if (cb) cb.checked = true;
+                });
+                if (d.otherSymptoms) document.getElementById('otherSymptoms').value = d.otherSymptoms;
+                updateCount();
+            } catch (e) { }
+        })();
+
+        function saveAndNext() {
+            const checked = [...document.querySelectorAll('.symptom-cb:checked')].map(c => c.value);
+            const data = {
+                symptoms: checked,
+                symptomLabels: checked.map(id => SYMPTOMS.find(s => s.id === id)?.label || id),
+                otherSymptoms: document.getElementById('otherSymptoms').value.trim(),
+            };
+            localStorage.setItem('screening_step3', JSON.stringify(data));
+            window.location.href = 'Patient summary.html';
+        }
+    </script>
+</body>
+
+</html>

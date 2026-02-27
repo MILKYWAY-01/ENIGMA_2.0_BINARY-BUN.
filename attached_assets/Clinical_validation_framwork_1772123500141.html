@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>OncoGuard AI — Clinical Validation Framework</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet" />
+    <script>
+        tailwind.config = { darkMode: "class", theme: { extend: { colors: { "primary": "#137fec", "background-light": "#f6f7f8" }, fontFamily: { "display": ["Inter", "sans-serif"] } } } }
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            min-height: 100dvh
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(8px)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0)
+            }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.4s ease forwards;
+            opacity: 0
+        }
+
+        .delay-1 {
+            animation-delay: 0.1s
+        }
+
+        .delay-2 {
+            animation-delay: 0.2s
+        }
+
+        .delay-3 {
+            animation-delay: 0.3s
+        }
+    </style>
+</head>
+
+<body class="bg-background-light font-display text-slate-900 min-h-screen flex flex-col">
+    <script src="js/auth.js"></script>
+    <script>requireAuth();</script>
+
+    <header class="sticky top-0 z-10 bg-white/90 backdrop-blur-md border-b border-slate-200">
+        <div class="max-w-2xl mx-auto flex items-center justify-between p-4">
+            <a href="model accuracy report.html"
+                class="flex items-center gap-2 text-primary hover:underline text-sm font-semibold">
+                <span class="material-symbols-outlined text-lg">arrow_back</span> Reports
+            </a>
+            <h1 class="text-lg font-bold tracking-tight">Validation</h1>
+            <button onclick="logout()"
+                class="text-xs text-slate-400 hover:text-red-500 transition flex items-center gap-1">
+                <span class="material-symbols-outlined text-sm">logout</span>
+            </button>
+        </div>
+    </header>
+
+    <main class="flex-1 max-w-2xl mx-auto w-full px-4 py-6 pb-28 space-y-6">
+        <!-- Overall Progress -->
+        <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-5 fade-in">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="font-bold flex items-center gap-2"><span
+                        class="material-symbols-outlined text-primary">verified</span>Clinical Validation Status</h3>
+                <span class="text-xs font-bold px-2 py-1 bg-amber-50 text-amber-700 rounded">IN PROGRESS</span>
+            </div>
+            <div class="mb-2 flex justify-between text-sm"><span class="text-slate-500">Overall Completion</span><span
+                    class="font-bold text-primary" id="overallPct">0%</span></div>
+            <div class="w-full h-3 bg-slate-100 rounded-full overflow-hidden">
+                <div id="overallBar" class="h-full bg-primary rounded-full transition-all duration-1000"
+                    style="width:0%"></div>
+            </div>
+        </div>
+
+        <!-- Validation Phases -->
+        <div class="fade-in delay-1">
+            <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3 px-1">Validation Phases</h3>
+            <div class="space-y-3" id="phasesList"></div>
+        </div>
+
+        <!-- Peer Reviews -->
+        <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-5 fade-in delay-2">
+            <h3 class="font-bold mb-4 flex items-center gap-2"><span
+                    class="material-symbols-outlined text-primary">group</span>Peer Review Board</h3>
+            <div class="space-y-3" id="reviewList"></div>
+        </div>
+
+        <!-- Certifications -->
+        <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-5 fade-in delay-3">
+            <h3 class="font-bold mb-4 flex items-center gap-2"><span
+                    class="material-symbols-outlined text-primary">workspace_premium</span>Compliance & Certifications
+            </h3>
+            <div class="grid grid-cols-2 gap-3" id="certList"></div>
+        </div>
+
+        <!-- Add Review -->
+        <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-5">
+            <h3 class="font-bold mb-4 flex items-center gap-2"><span
+                    class="material-symbols-outlined text-primary">rate_review</span>Submit Validation Note</h3>
+            <form id="reviewForm" onsubmit="return addReviewNote(event)" class="space-y-3">
+                <select id="notePhase" required
+                    class="w-full rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm focus:ring-2 focus:ring-primary outline-none">
+                    <option value="">Select Phase...</option>
+                    <option value="Phase I">Phase I — Lab Validation</option>
+                    <option value="Phase II">Phase II — Clinical Trial</option>
+                    <option value="Phase III">Phase III — Multi-center</option>
+                    <option value="Phase IV">Phase IV — Regulatory</option>
+                </select>
+                <textarea id="noteText" required rows="2" placeholder="Enter your validation note..."
+                    class="w-full rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm focus:ring-2 focus:ring-primary outline-none"></textarea>
+                <button type="submit"
+                    class="w-full bg-primary text-white font-bold py-3 rounded-lg hover:bg-primary/90 transition flex items-center justify-center gap-2">
+                    <span class="material-symbols-outlined text-lg">send</span> Submit Note
+                </button>
+            </form>
+            <div class="mt-4 space-y-2" id="notesList"></div>
+        </div>
+    </main>
+
+    <!-- Bottom Nav -->
+    <nav class="fixed bottom-0 left-0 right-0 border-t border-slate-200 bg-white/90 backdrop-blur-md pb-6 pt-2 px-4">
+        <div class="max-w-2xl mx-auto flex justify-around items-center">
+            <a class="flex flex-col items-center gap-1 text-slate-400 hover:text-primary transition"
+                href="risk prediction dashboard.html">
+                <span class="material-symbols-outlined">dashboard</span><span
+                    class="text-[10px] font-bold">Dashboard</span>
+            </a>
+            <a class="flex flex-col items-center gap-1 text-slate-400 hover:text-primary transition"
+                href="model accuracy report.html">
+                <span class="material-symbols-outlined">analytics</span><span
+                    class="text-[10px] font-bold">Reports</span>
+            </a>
+            <a class="flex flex-col items-center gap-1 text-primary" href="Clinical validation framwork.html">
+                <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1">fact_check</span><span
+                    class="text-[10px] font-bold">Validation</span>
+            </a>
+            <a class="flex flex-col items-center gap-1 text-slate-400 hover:text-primary transition"
+                href="Add medical data.html">
+                <span class="material-symbols-outlined">add_circle</span><span class="text-[10px] font-bold">Add
+                    Data</span>
+            </a>
+        </div>
+    </nav>
+
+    <script>
+        // Phases
+        const phases = [
+            { name: 'Phase I — Lab Validation', desc: 'In-vitro testing & baseline metrics', pct: 100, icon: 'science', status: 'COMPLETE', color: '#10b981' },
+            { name: 'Phase II — Clinical Trial', desc: '200-patient single-center trial', pct: 85, icon: 'clinical_notes', status: '85%', color: '#137fec' },
+            { name: 'Phase III — Multi-center', desc: '1000-patient multi-site validation', pct: 42, icon: 'local_hospital', status: '42%', color: '#f59e0b' },
+            { name: 'Phase IV — Regulatory', desc: 'FDA 510k & CE Mark submission', pct: 10, icon: 'gavel', status: 'PENDING', color: '#94a3b8' },
+        ];
+        document.getElementById('phasesList').innerHTML = phases.map(p => `
+            <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-4">
+                <div class="flex items-center gap-3 mb-3">
+                    <div class="w-10 h-10 rounded-lg flex items-center justify-center" style="background:${p.color}15">
+                        <span class="material-symbols-outlined" style="color:${p.color}">${p.icon}</span></div>
+                    <div class="flex-1"><p class="font-semibold text-sm">${p.name}</p><p class="text-xs text-slate-400">${p.desc}</p></div>
+                    <span class="text-xs font-bold px-2 py-1 rounded" style="background:${p.color}15;color:${p.color}">${p.status}</span>
+                </div>
+                <div class="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
+                    <div class="h-full rounded-full transition-all duration-1000" style="width:${p.pct}%;background:${p.color}"></div>
+                </div>
+            </div>
+        `).join('');
+
+        // Overall %
+        const overallPct = Math.round(phases.reduce((s, p) => s + p.pct, 0) / phases.length);
+        document.getElementById('overallPct').textContent = overallPct + '%';
+        setTimeout(() => document.getElementById('overallBar').style.width = overallPct + '%', 100);
+
+        // Peer Reviews
+        const reviews = [
+            { name: 'Dr. Sarah Chen', role: 'Oncology Lead', status: 'Approved', avatar: 'S', color: '#10b981' },
+            { name: 'Dr. James Wright', role: 'Pathologist', status: 'Approved', avatar: 'J', color: '#10b981' },
+            { name: 'Dr. Maria Gonzalez', role: 'Biostatistician', status: 'Under Review', avatar: 'M', color: '#f59e0b' },
+            { name: 'Dr. Robert Kim', role: 'Radiologist', status: 'Pending', avatar: 'R', color: '#94a3b8' },
+        ];
+        document.getElementById('reviewList').innerHTML = reviews.map(r => `
+            <div class="flex items-center gap-3 p-2 rounded-lg hover:bg-slate-50 transition">
+                <div class="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold">${r.avatar}</div>
+                <div class="flex-1"><p class="font-semibold text-sm">${r.name}</p><p class="text-xs text-slate-400">${r.role}</p></div>
+                <span class="text-xs font-bold px-2 py-1 rounded" style="background:${r.color}15;color:${r.color}">${r.status}</span>
+            </div>
+        `).join('');
+
+        // Certifications
+        const certs = [
+            { name: 'HIPAA', status: 'Compliant', icon: 'shield', color: '#10b981' },
+            { name: 'FDA 510(k)', status: 'In Progress', icon: 'gavel', color: '#f59e0b' },
+            { name: 'CE Mark', status: 'Pending', icon: 'public', color: '#94a3b8' },
+            { name: 'ISO 13485', status: 'Certified', icon: 'workspace_premium', color: '#10b981' },
+        ];
+        document.getElementById('certList').innerHTML = certs.map(c => `
+            <div class="bg-slate-50 rounded-lg p-3 flex items-center gap-3">
+                <span class="material-symbols-outlined" style="color:${c.color}">${c.icon}</span>
+                <div><p class="text-sm font-bold">${c.name}</p><p class="text-[10px] font-medium" style="color:${c.color}">${c.status}</p></div>
+            </div>
+        `).join('');
+
+        // Validation notes (localStorage)
+        function loadNotes() {
+            const notes = JSON.parse(localStorage.getItem('validation_notes') || '[]');
+            if (notes.length === 0) {
+                document.getElementById('notesList').innerHTML = '<p class="text-sm text-slate-400 italic text-center py-2">No notes yet. Submit one above.</p>';
+                return;
+            }
+            document.getElementById('notesList').innerHTML = notes.map((n, i) => `
+                <div class="flex items-start gap-3 p-3 bg-slate-50 rounded-lg border border-slate-100">
+                    <span class="material-symbols-outlined text-primary text-sm mt-0.5">note</span>
+                    <div class="flex-1">
+                        <div class="flex justify-between"><span class="text-xs font-bold text-primary">${n.phase}</span><span class="text-[10px] text-slate-400">${n.date}</span></div>
+                        <p class="text-sm mt-1">${n.text}</p>
+                    </div>
+                    <button onclick="deleteNote(${i})" class="text-slate-300 hover:text-red-500 transition"><span class="material-symbols-outlined text-sm">close</span></button>
+                </div>
+            `).join('');
+        }
+        loadNotes();
+
+        function addReviewNote(e) {
+            e.preventDefault();
+            const notes = JSON.parse(localStorage.getItem('validation_notes') || '[]');
+            notes.unshift({
+                phase: document.getElementById('notePhase').value,
+                text: document.getElementById('noteText').value.trim(),
+                date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+            });
+            localStorage.setItem('validation_notes', JSON.stringify(notes));
+            document.getElementById('reviewForm').reset();
+            loadNotes();
+            return false;
+        }
+
+        function deleteNote(idx) {
+            const notes = JSON.parse(localStorage.getItem('validation_notes') || '[]');
+            notes.splice(idx, 1);
+            localStorage.setItem('validation_notes', JSON.stringify(notes));
+            loadNotes();
+        }
+    </script>
+</body>
+
+</html>

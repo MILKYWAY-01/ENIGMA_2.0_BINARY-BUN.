@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Patient Screening - Step 2</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#137fec",
+                        "background-light": "#f6f7f8",
+                        "background-dark": "#101922",
+                    },
+                    fontFamily: {
+                        "display": ["Inter"]
+                    },
+                    borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" },
+                },
+            },
+        }
+    </script>
+    <style>
+        body {
+            min-height: max(884px, 100dvh);
+        }
+    </style>
+</head>
+
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100">
+    <div
+        class="relative flex h-auto min-h-screen w-full flex-col bg-background-light dark:bg-background-dark group/design-root overflow-x-hidden max-w-md mx-auto border-x border-primary/10">
+        <!-- Header -->
+        <div class="flex items-center bg-background-light dark:bg-background-dark p-4 pb-2 justify-between">
+            <a href="screeing step1.html"
+                class="text-primary flex size-12 shrink-0 items-center justify-center cursor-pointer">
+                <span class="material-symbols-outlined">arrow_back</span>
+            </a>
+            <h2
+                class="text-slate-900 dark:text-slate-100 text-lg font-bold leading-tight tracking-[-0.015em] flex-1 text-center pr-12">
+                Patient Screening</h2>
+        </div>
+        <!-- Progress Bar Section -->
+        <div class="flex flex-col gap-3 p-4">
+            <div class="flex gap-6 justify-between items-center">
+                <p class="text-slate-900 dark:text-slate-100 text-base font-semibold leading-normal">Medical History</p>
+                <p class="text-slate-500 dark:text-slate-400 text-sm font-normal leading-normal">Step 2 of 5</p>
+            </div>
+            <div class="rounded-full bg-primary/20 h-2 w-full overflow-hidden">
+                <div class="h-full bg-primary" style="width: 40%;"></div>
+            </div>
+        </div>
+        <!-- Title & Description -->
+        <div class="px-4 pt-5">
+            <h3 class="text-slate-900 dark:text-slate-100 tracking-tight text-2xl font-bold leading-tight">Step 2:
+                Medical History</h3>
+            <p class="text-slate-600 dark:text-slate-400 text-base font-normal leading-normal pt-2">Please provide
+                details about your medical background to help us provide better care.</p>
+        </div>
+        <!-- Form Fields -->
+        <div class="flex flex-col gap-6 px-4 py-6">
+            <!-- Previous Conditions -->
+            <div class="flex flex-col gap-2">
+                <label class="flex flex-col w-full">
+                    <p class="text-slate-900 dark:text-slate-100 text-base font-semibold leading-normal pb-2">Previous
+                        Conditions</p>
+                    <textarea
+                        class="form-textarea flex w-full rounded-lg text-slate-900 dark:text-slate-100 border border-primary/20 bg-white dark:bg-slate-800 focus:border-primary focus:ring-1 focus:ring-primary min-h-[120px] placeholder:text-slate-400 p-4 text-base font-normal leading-normal"
+                        placeholder="List any chronic illnesses, past surgeries, or long-term treatments..."></textarea>
+                </label>
+            </div>
+            <!-- Family History -->
+            <div class="flex flex-col gap-2">
+                <label class="flex flex-col w-full">
+                    <p class="text-slate-900 dark:text-slate-100 text-base font-semibold leading-normal pb-2">Family
+                        History</p>
+                    <textarea
+                        class="form-textarea flex w-full rounded-lg text-slate-900 dark:text-slate-100 border border-primary/20 bg-white dark:bg-slate-800 focus:border-primary focus:ring-1 focus:ring-primary min-h-[120px] placeholder:text-slate-400 p-4 text-base font-normal leading-normal"
+                        placeholder="Detail any hereditary conditions like heart disease, diabetes, or cancer..."></textarea>
+                </label>
+            </div>
+            <!-- Current Medications (Optional Extra for UI completeness) -->
+            <div class="flex flex-col gap-2">
+                <label class="flex flex-col w-full">
+                    <p class="text-slate-900 dark:text-slate-100 text-base font-semibold leading-normal pb-2">Current
+                        Medications</p>
+                    <input
+                        class="form-input flex w-full rounded-lg text-slate-900 dark:text-slate-100 border border-primary/20 bg-white dark:bg-slate-800 focus:border-primary focus:ring-1 focus:ring-primary h-12 placeholder:text-slate-400 px-4 text-base font-normal leading-normal"
+                        placeholder="List any current prescriptions or supplements" type="text" />
+                </label>
+            </div>
+            <!-- Allergy Checkbox Group -->
+            <div class="flex flex-col gap-3 py-2">
+                <p class="text-slate-900 dark:text-slate-100 text-base font-semibold leading-normal">Known Allergies</p>
+                <div class="flex flex-wrap gap-2">
+                    <button
+                        class="px-4 py-2 rounded-full border border-primary bg-primary/10 text-primary text-sm font-medium">None</button>
+                    <button
+                        class="px-4 py-2 rounded-full border border-primary/20 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 text-sm font-medium">Penicillin</button>
+                    <button
+                        class="px-4 py-2 rounded-full border border-primary/20 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 text-sm font-medium">Latex</button>
+                    <button
+                        class="px-4 py-2 rounded-full border border-primary/20 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 text-sm font-medium">Other</button>
+                </div>
+            </div>
+        </div>
+        <!-- Spacer -->
+        <div class="flex-grow"></div>
+        <!-- Bottom Action Bar -->
+        <div class="sticky bottom-0 bg-background-light dark:bg-background-dark border-t border-primary/10 p-4 w-full">
+            <a href="lifestyle Assessment.html"
+                class="flex w-full cursor-pointer items-center justify-center overflow-hidden rounded-xl h-12 px-5 bg-primary text-white text-base font-bold leading-normal tracking-[0.015em] hover:bg-primary/90 transition-colors">
+                <span class="truncate">Continue to Step 3</span>
+                <span class="material-symbols-outlined ml-2 text-lg">arrow_forward</span>
+            </a>
+            <a href="screeing step1.html"
+                class="mt-2 flex w-full cursor-pointer items-center justify-center overflow-hidden rounded-xl h-12 px-5 bg-transparent text-slate-500 dark:text-slate-400 text-sm font-medium leading-normal hover:bg-primary/5 transition-colors">
+                Save and finish later
+            </a>
+        </div>
+    </div>
+</body>
+
+</html>

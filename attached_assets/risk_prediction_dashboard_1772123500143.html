@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>OncoGuard AI — Risk Prediction Dashboard</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet" />
+    <script>
+        tailwind.config = { darkMode: "class", theme: { extend: { colors: { "primary": "#137fec", "background-light": "#f6f7f8", "background-dark": "#101922" }, fontFamily: { "display": ["Inter", "sans-serif"] }, borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" } } } }
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            min-height: 100dvh
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(8px)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0)
+            }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease forwards;
+            opacity: 0
+        }
+
+        .delay-1 {
+            animation-delay: 0.1s
+        }
+
+        .delay-2 {
+            animation-delay: 0.2s
+        }
+
+        .delay-3 {
+            animation-delay: 0.3s
+        }
+
+        .delay-4 {
+            animation-delay: 0.4s
+        }
+
+        @keyframes draw {
+            to {
+                stroke-dashoffset: 0
+            }
+        }
+
+        .gauge-animate {
+            animation: draw 1.5s ease forwards
+        }
+    </style>
+</head>
+
+<body class="bg-background-light font-display text-slate-900 min-h-screen flex flex-col">
+    <script src="js/auth.js"></script>
+    <script>requireAuth();</script>
+
+    <!-- Header -->
+    <header class="sticky top-0 z-10 bg-white/90 backdrop-blur-md border-b border-slate-200">
+        <div class="max-w-2xl mx-auto flex items-center justify-between p-4">
+            <a href="Patient summary.html"
+                class="flex items-center gap-2 text-primary hover:underline text-sm font-semibold">
+                <span class="material-symbols-outlined text-lg">arrow_back</span> Summary
+            </a>
+            <h1 class="text-lg font-bold tracking-tight">Risk Dashboard</h1>
+            <button onclick="logout()"
+                class="text-xs text-slate-400 hover:text-red-500 transition flex items-center gap-1">
+                <span class="material-symbols-outlined text-sm">logout</span>
+            </button>
+        </div>
+    </header>
+
+    <main class="flex-1 max-w-2xl mx-auto w-full overflow-y-auto pb-28 px-4">
+        <!-- Patient Banner -->
+        <div class="mt-6 bg-white rounded-xl border border-slate-200 shadow-sm p-4 flex items-center gap-4 fade-in">
+            <div class="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">
+                <span class="material-symbols-outlined text-primary text-2xl">person</span>
+            </div>
+            <div class="flex-1">
+                <p class="font-bold text-base" id="patientName">Loading...</p>
+                <p class="text-xs text-slate-500" id="patientMeta">—</p>
+            </div>
+            <span id="riskBadge" class="px-3 py-1 rounded-full text-xs font-bold uppercase"></span>
+        </div>
+
+        <!-- Risk Gauge -->
+        <section class="py-8 flex flex-col items-center fade-in delay-1">
+            <div class="relative w-48 h-48 flex items-center justify-center">
+                <svg class="w-full h-full transform -rotate-90" viewBox="0 0 192 192">
+                    <circle cx="96" cy="96" r="88" fill="transparent" stroke="#e2e8f0" stroke-width="12"></circle>
+                    <circle id="gaugeCircle" cx="96" cy="96" r="88" fill="transparent" stroke="#137fec"
+                        stroke-width="12" stroke-dasharray="552.92" stroke-dashoffset="552.92" stroke-linecap="round"
+                        class="gauge-animate"></circle>
+                </svg>
+                <div class="absolute inset-0 flex flex-col items-center justify-center">
+                    <span class="text-4xl font-extrabold" id="riskPercent">—</span>
+                    <span class="text-sm font-medium text-slate-500" id="riskLabel">Calculating...</span>
+                </div>
+            </div>
+            <p class="mt-4 text-center text-sm text-slate-600 max-w-xs" id="riskSummary">Analyzing patient data...</p>
+        </section>
+
+        <!-- Key Indicators -->
+        <section class="fade-in delay-2">
+            <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3 px-1">Risk Factor Breakdown</h3>
+            <div class="space-y-3" id="indicatorsList"></div>
+        </section>
+
+        <!-- Lifestyle Score -->
+        <section class="mt-6 fade-in delay-3">
+            <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3 px-1">Lifestyle Score</h3>
+            <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-5" id="lifestyleScoreCard"></div>
+        </section>
+
+        <!-- Symptoms -->
+        <section class="mt-6 fade-in delay-4">
+            <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3 px-1">Reported Symptoms</h3>
+            <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-5" id="symptomsCard"></div>
+        </section>
+
+        <!-- Next Steps -->
+        <section class="mt-6">
+            <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3 px-1">Recommended Actions</h3>
+            <div class="space-y-3" id="nextSteps"></div>
+        </section>
+    </main>
+
+    <!-- Bottom Nav -->
+    <nav class="fixed bottom-0 left-0 right-0 border-t border-slate-200 bg-white/90 backdrop-blur-md pb-6 pt-2 px-4">
+        <div class="max-w-2xl mx-auto flex justify-around items-center">
+            <a class="flex flex-col items-center gap-1 text-primary" href="risk prediction dashboard.html">
+                <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1">dashboard</span>
+                <span class="text-[10px] font-bold">Dashboard</span>
+            </a>
+            <a class="flex flex-col items-center gap-1 text-slate-400 hover:text-primary transition"
+                href="model accuracy report.html">
+                <span class="material-symbols-outlined">analytics</span>
+                <span class="text-[10px] font-bold">Reports</span>
+            </a>
+            <a class="flex flex-col items-center gap-1 text-slate-400 hover:text-primary transition"
+                href="Clinical validation framwork.html">
+                <span class="material-symbols-outlined">fact_check</span>
+                <span class="text-[10px] font-bold">Validation</span>
+            </a>
+            <a class="flex flex-col items-center gap-1 text-slate-400 hover:text-primary transition"
+                href="Add medical data.html">
+                <span class="material-symbols-outlined">add_circle</span>
+                <span class="text-[10px] font-bold">Add Data</span>
+            </a>
+        </div>
+    </nav>
+
+    <script>
+        const s1 = JSON.parse(localStorage.getItem('screening_step1') || 'null');
+        const s2 = JSON.parse(localStorage.getItem('screening_step2') || 'null');
+        const s3 = JSON.parse(localStorage.getItem('screening_step3') || 'null');
+        const medData = JSON.parse(localStorage.getItem('medical_data') || '[]');
+
+        // ── PATIENT BANNER ──
+        if (s1) {
+            document.getElementById('patientName').textContent = s1.fullName || 'Unknown';
+            document.getElementById('patientMeta').textContent = `Age ${s1.age || '?'} • ${s1.gender || '?'} • ID #OG-${Date.now().toString(36).toUpperCase().slice(-6)}`;
+        }
+
+        // ── CALCULATE RISK SCORE ──
+        let riskScore = 10; // base
+        const age = parseInt(s1?.age) || 30;
+        if (age > 60) riskScore += 20; else if (age > 50) riskScore += 12; else if (age > 40) riskScore += 6;
+
+        // Smoking
+        if (s2?.smoking === 'Daily smoker') riskScore += 25;
+        else if (s2?.smoking === 'Occasional smoker') riskScore += 15;
+        else if (s2?.smoking === 'Former smoker') riskScore += 6;
+
+        // Alcohol
+        const alc = parseInt(s2?.alcohol) || 0;
+        if (alc > 14) riskScore += 15; else if (alc > 7) riskScore += 8; else if (alc > 3) riskScore += 3;
+
+        // Exercise
+        if (s2?.exercise?.includes('Rarely')) riskScore += 10;
+        else if (s2?.exercise?.includes('Moderate')) riskScore += 3;
+
+        // Sleep
+        const sleep = parseFloat(s2?.sleep) || 7;
+        if (sleep < 5) riskScore += 10; else if (sleep < 6) riskScore += 5;
+
+        // Stress
+        if (s2?.stress === 'Very High') riskScore += 10;
+        else if (s2?.stress === 'High') riskScore += 6;
+
+        // Symptoms
+        const symptoms = s3?.symptomLabels || [];
+        const criticalSymptoms = ['Chest Pain', 'Shortness of Breath', 'Weight Changes'];
+        const moderateSymptoms = ['Fatigue', 'Fever', 'Joint Pain', 'Nausea'];
+        symptoms.forEach(s => {
+            if (criticalSymptoms.includes(s)) riskScore += 8;
+            else if (moderateSymptoms.includes(s)) riskScore += 4;
+            else riskScore += 2;
+        });
+
+        riskScore = Math.min(riskScore, 95);
+
+        // ── RENDER GAUGE ──
+        let riskColor, riskText, riskDesc;
+        if (riskScore <= 25) { riskColor = '#10b981'; riskText = 'Low Risk'; riskDesc = 'Your screening results indicate a healthy profile. Continue regular checkups.'; }
+        else if (riskScore <= 50) { riskColor = '#f59e0b'; riskText = 'Moderate Risk'; riskDesc = 'Some risk factors detected. We recommend follow-up evaluation and lifestyle adjustments.'; }
+        else if (riskScore <= 75) { riskColor = '#f97316'; riskText = 'Elevated Risk'; riskDesc = 'Multiple risk factors identified. Priority clinical consultation recommended.'; }
+        else { riskColor = '#ef4444'; riskText = 'High Risk'; riskDesc = 'Significant risk factors present. Immediate medical evaluation strongly recommended.'; }
+
+        const offset = 552.92 - (552.92 * riskScore / 100);
+        const gc = document.getElementById('gaugeCircle');
+        gc.style.stroke = riskColor;
+        gc.style.strokeDashoffset = offset;
+        document.getElementById('riskPercent').textContent = riskScore + '%';
+        document.getElementById('riskLabel').textContent = riskText;
+        document.getElementById('riskLabel').style.color = riskColor;
+        document.getElementById('riskSummary').textContent = riskDesc;
+
+        const badge = document.getElementById('riskBadge');
+        badge.textContent = riskText;
+        badge.style.background = riskColor + '20';
+        badge.style.color = riskColor;
+
+        // ── INDICATORS ──
+        function indicator(icon, title, detail, status, statusColor) {
+            return `<div class="flex items-center gap-4 bg-white p-4 rounded-xl border border-slate-100 shadow-sm">
+                <div class="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center text-primary"><span class="material-symbols-outlined">${icon}</span></div>
+                <div class="flex-1"><p class="font-semibold">${title}</p><p class="text-xs text-slate-500">${detail}</p></div>
+                <span class="px-2 py-1 rounded text-xs font-bold" style="background:${statusColor}20;color:${statusColor}">${status}</span>
+            </div>`;
+        }
+
+        let indicators = '';
+        // Age
+        if (age > 50) indicators += indicator('cake', 'Age Factor', `${age} years old`, 'ELEVATED', '#f97316');
+        else indicators += indicator('cake', 'Age Factor', `${age} years old`, 'NORMAL', '#10b981');
+        // Smoking
+        const smokingStatus = s2?.smoking || 'Unknown';
+        const smokingRisk = smokingStatus.includes('Daily') ? 'HIGH' : smokingStatus.includes('Occasional') ? 'MODERATE' : smokingStatus.includes('Former') ? 'MILD' : 'CLEAR';
+        const smokingColor = smokingRisk === 'HIGH' ? '#ef4444' : smokingRisk === 'MODERATE' ? '#f97316' : smokingRisk === 'MILD' ? '#f59e0b' : '#10b981';
+        indicators += indicator('smoke_free', 'Tobacco Use', smokingStatus, smokingRisk, smokingColor);
+        // Symptoms
+        const symCount = symptoms.length;
+        const symStatus = symCount === 0 ? 'CLEAR' : symCount <= 2 ? 'MONITOR' : 'ATTENTION';
+        const symColor = symCount === 0 ? '#10b981' : symCount <= 2 ? '#f59e0b' : '#ef4444';
+        indicators += indicator('checklist', 'Symptom Count', `${symCount} symptom(s) reported`, symStatus, symColor);
+        // Alcohol
+        const alcStatus = alc > 14 ? 'HIGH' : alc > 7 ? 'MODERATE' : 'NORMAL';
+        const alcColor = alc > 14 ? '#ef4444' : alc > 7 ? '#f59e0b' : '#10b981';
+        indicators += indicator('local_bar', 'Alcohol', `${alc} drinks/week`, alcStatus, alcColor);
+        document.getElementById('indicatorsList').innerHTML = indicators;
+
+        // ── LIFESTYLE SCORE ──
+        let lifestyleScore = 100;
+        if (s2?.smoking === 'Daily smoker') lifestyleScore -= 30;
+        else if (s2?.smoking === 'Occasional smoker') lifestyleScore -= 15;
+        if (alc > 14) lifestyleScore -= 20; else if (alc > 7) lifestyleScore -= 10;
+        if (s2?.exercise?.includes('Rarely')) lifestyleScore -= 15;
+        if (sleep < 6) lifestyleScore -= 10;
+        if (s2?.stress === 'Very High') lifestyleScore -= 15; else if (s2?.stress === 'High') lifestyleScore -= 8;
+        const water = parseFloat(s2?.water) || 2;
+        if (water < 1.5) lifestyleScore -= 5;
+        lifestyleScore = Math.max(lifestyleScore, 5);
+        const lsColor = lifestyleScore >= 75 ? '#10b981' : lifestyleScore >= 50 ? '#f59e0b' : '#ef4444';
+        document.getElementById('lifestyleScoreCard').innerHTML = `
+            <div class="flex justify-between items-center mb-3">
+                <span class="text-sm text-slate-500">Overall Lifestyle Health</span>
+                <span class="text-2xl font-extrabold" style="color:${lsColor}">${lifestyleScore}/100</span>
+            </div>
+            <div class="w-full h-3 bg-slate-100 rounded-full overflow-hidden">
+                <div class="h-full rounded-full transition-all duration-1000" style="width:${lifestyleScore}%;background:${lsColor}"></div>
+            </div>
+            <div class="grid grid-cols-3 gap-3 mt-4 text-center text-xs">
+                <div><p class="text-slate-400">Exercise</p><p class="font-bold">${s2?.exercise?.split('(')[0] || '—'}</p></div>
+                <div><p class="text-slate-400">Sleep</p><p class="font-bold">${sleep}h</p></div>
+                <div><p class="text-slate-400">Diet</p><p class="font-bold">${s2?.diet || '—'}</p></div>
+            </div>`;
+
+        // ── SYMPTOMS CARD ──
+        let symHtml = '';
+        if (symptoms.length === 0) {
+            symHtml = '<p class="text-green-600 font-medium flex items-center gap-2"><span class="material-symbols-outlined text-sm">check_circle</span>No symptoms reported — positive indicator</p>';
+        } else {
+            symHtml = '<div class="flex flex-wrap gap-2">';
+            symptoms.forEach(s => { symHtml += `<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-red-50 text-red-600 text-xs font-semibold"><span class="material-symbols-outlined text-xs">warning</span>${s}</span>`; });
+            symHtml += '</div>';
+        }
+        if (s3?.otherSymptoms) symHtml += `<p class="mt-3 text-sm text-slate-600"><strong>Other:</strong> ${s3.otherSymptoms}</p>`;
+        document.getElementById('symptomsCard').innerHTML = symHtml;
+
+        // ── NEXT STEPS ──
+        let steps = '';
+        steps += `<div class="flex items-start gap-4 bg-primary/5 border border-primary/20 rounded-xl p-4">
+            <div class="w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center shrink-0"><span class="material-symbols-outlined">calendar_today</span></div>
+            <div><p class="font-bold">Schedule Follow-up</p><p class="text-sm text-slate-600 mt-1">${riskScore > 50 ? 'Priority consultation recommended within 1-2 weeks.' : 'Routine checkup recommended within 3-6 months.'}</p>
+            <button class="mt-2 px-4 py-2 bg-primary text-white text-sm font-bold rounded-lg hover:bg-primary/90 transition">Book Now</button></div>
+        </div>`;
+        if (riskScore > 50) {
+            steps += `<div class="flex items-start gap-4 bg-amber-50 border border-amber-200 rounded-xl p-4">
+                <div class="w-10 h-10 rounded-full bg-amber-500 text-white flex items-center justify-center shrink-0"><span class="material-symbols-outlined">bloodtype</span></div>
+                <div><p class="font-bold">Blood Work Recommended</p><p class="text-sm text-slate-600 mt-1">Complete metabolic panel, CBC, and tumor marker screening suggested.</p></div>
+            </div>`;
+        }
+        steps += `<div class="flex items-start gap-4 bg-white border border-slate-200 rounded-xl p-4">
+            <div class="w-10 h-10 rounded-full bg-slate-100 text-slate-600 flex items-center justify-center shrink-0"><span class="material-symbols-outlined">repeat</span></div>
+            <div><p class="font-bold">Re-screen</p><p class="text-sm text-slate-600 mt-1">Run this screening again in ${riskScore > 50 ? '3' : '6'} months or if new symptoms develop.</p>
+            <a href="screeing step1.html" class="mt-2 inline-flex px-4 py-2 border border-primary text-primary text-sm font-bold rounded-lg hover:bg-primary/5 transition">New Screening</a></div>
+        </div>`;
+        document.getElementById('nextSteps').innerHTML = steps;
+    </script>
+</body>
+
+</html>

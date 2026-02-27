@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>OncoGuard AI - Secure Login</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet" />
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: { "primary": "#137fec", "background-light": "#f6f7f8", "background-dark": "#101922" },
+                    fontFamily: { "display": ["Inter"] },
+                    borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" },
+                },
+            },
+        }
+    </script>
+    <style>
+        body {
+            min-height: 100dvh;
+            font-family: 'Inter', sans-serif;
+        }
+
+        @keyframes shake {
+
+            0%,
+            100% {
+                transform: translateX(0)
+            }
+
+            20%,
+            60% {
+                transform: translateX(-8px)
+            }
+
+            40%,
+            80% {
+                transform: translateX(8px)
+            }
+        }
+
+        .shake {
+            animation: shake 0.4s ease;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(12px)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0)
+            }
+        }
+
+        .fade-in-up {
+            animation: fadeInUp 0.5s ease forwards;
+        }
+    </style>
+</head>
+
+<body
+    class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 min-h-screen flex flex-col">
+    <!-- Progress Bar -->
+    <div class="w-full bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800 px-6 py-3">
+        <div class="max-w-md mx-auto">
+            <div class="flex items-center justify-between text-xs text-slate-400 mb-1.5">
+                <a href="userselection.html" class="font-semibold text-primary flex items-center gap-1 hover:underline">
+                    <span class="material-symbols-outlined text-sm">arrow_back</span> Back to Portal
+                </a>
+                <span>Step 1 — Authenticate</span>
+            </div>
+            <div class="w-full h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+                <div class="h-full bg-primary rounded-full transition-all duration-500" style="width:5%"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="relative flex flex-1 w-full flex-col items-center justify-center p-4">
+        <!-- Login Card -->
+        <div class="w-full max-w-md bg-white dark:bg-slate-900 rounded-xl shadow-xl overflow-hidden border border-slate-200 dark:border-slate-800 fade-in-up"
+            id="loginCard">
+            <!-- Header -->
+            <div class="p-8 pb-4 text-center">
+                <div class="flex justify-center mb-6">
+                    <div class="bg-primary/10 p-3 rounded-full">
+                        <span class="material-symbols-outlined text-primary text-4xl">shield_with_heart</span>
+                    </div>
+                </div>
+                <h2 class="text-2xl font-bold tracking-tight">OncoGuard AI</h2>
+                <p class="mt-2 text-slate-500 dark:text-slate-400 text-sm">Secure Early Detection Portal</p>
+            </div>
+            <!-- Form -->
+            <div class="px-8 pt-2 pb-8">
+                <h1 class="text-xl font-bold mb-2 text-center">Welcome Back</h1>
+                <p class="text-slate-500 dark:text-slate-400 text-sm text-center mb-8">
+                    Access your diagnostic dashboard and patient records.
+                </p>
+
+                <!-- Error Message -->
+                <div id="errorMsg"
+                    class="hidden mb-4 p-3 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 text-sm font-medium flex items-center gap-2">
+                    <span class="material-symbols-outlined text-lg">error</span>
+                    <span>Invalid username or password. Please try again.</span>
+                </div>
+
+                <form id="loginForm" class="space-y-5" onsubmit="return handleLogin(event)">
+                    <!-- Username -->
+                    <div class="space-y-2">
+                        <label class="text-sm font-semibold text-slate-700 dark:text-slate-300 block">Username</label>
+                        <div class="relative">
+                            <span
+                                class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xl">person</span>
+                            <input id="username" required autocomplete="username"
+                                class="w-full pl-10 pr-4 py-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 focus:ring-2 focus:ring-primary focus:border-transparent transition-all outline-none"
+                                placeholder="e.g. doctor" type="text" />
+                        </div>
+                    </div>
+                    <!-- Password -->
+                    <div class="space-y-2">
+                        <div class="flex justify-between items-center">
+                            <label class="text-sm font-semibold text-slate-700 dark:text-slate-300">Password</label>
+                        </div>
+                        <div class="relative">
+                            <span
+                                class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xl">lock</span>
+                            <input id="password" required autocomplete="current-password"
+                                class="w-full pl-10 pr-12 py-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 focus:ring-2 focus:ring-primary focus:border-transparent transition-all outline-none"
+                                placeholder="••••••••" type="password" />
+                            <button onclick="togglePassword()"
+                                class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                                type="button">
+                                <span id="eyeIcon" class="material-symbols-outlined text-xl">visibility</span>
+                            </button>
+                        </div>
+                    </div>
+                    <!-- Sign In -->
+                    <button id="signInBtn"
+                        class="w-full bg-primary hover:bg-primary/90 text-white font-bold py-3.5 rounded-lg transition-colors shadow-md shadow-primary/20 flex items-center justify-center gap-2 mt-4 disabled:opacity-60"
+                        type="submit">
+                        <span id="btnText">Sign In</span>
+                        <span id="btnSpinner"
+                            class="hidden animate-spin material-symbols-outlined text-lg">progress_activity</span>
+                        <span id="btnIcon" class="material-symbols-outlined text-lg">login</span>
+                    </button>
+                </form>
+                <!-- Hint -->
+                <div
+                    class="mt-6 p-3 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700">
+                    <p class="text-[11px] text-slate-400 text-center">
+                        <strong>Demo credentials:</strong> username <code
+                            class="bg-slate-200 dark:bg-slate-700 px-1 rounded text-primary font-bold">doctor</code>
+                        / password <code
+                            class="bg-slate-200 dark:bg-slate-700 px-1 rounded text-primary font-bold">oncoguard2024</code>
+                    </p>
+                </div>
+            </div>
+            <!-- Footer Badge -->
+            <div
+                class="bg-slate-50 dark:bg-slate-800/50 p-4 border-t border-slate-100 dark:border-slate-800 flex justify-center items-center gap-2">
+                <span class="material-symbols-outlined text-green-500 text-sm">verified_user</span>
+                <span class="text-[10px] uppercase tracking-widest font-bold text-slate-500 dark:text-slate-400">Secure
+                    &amp; Encrypted 256-bit SSL</span>
+            </div>
+        </div>
+        <!-- Decorative blurs -->
+        <div class="fixed -z-10 top-0 left-0 w-full h-full opacity-10 pointer-events-none">
+            <div class="absolute top-[10%] left-[5%] w-64 h-64 rounded-full bg-primary blur-3xl"></div>
+            <div class="absolute bottom-[10%] right-[5%] w-96 h-96 rounded-full bg-primary blur-3xl"></div>
+        </div>
+    </div>
+
+    <script src="js/auth.js"></script>
+    <script>
+        // If already logged in, skip to step 1
+        if (isAuthenticated()) {
+            window.location.href = 'screeing step1.html';
+        }
+
+        function togglePassword() {
+            const pw = document.getElementById('password');
+            const icon = document.getElementById('eyeIcon');
+            if (pw.type === 'password') { pw.type = 'text'; icon.textContent = 'visibility_off'; }
+            else { pw.type = 'password'; icon.textContent = 'visibility'; }
+        }
+
+        function handleLogin(e) {
+            e.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const card = document.getElementById('loginCard');
+            const errorMsg = document.getElementById('errorMsg');
+            const btn = document.getElementById('signInBtn');
+            const btnText = document.getElementById('btnText');
+            const btnSpinner = document.getElementById('btnSpinner');
+            const btnIcon = document.getElementById('btnIcon');
+
+            // Show spinner
+            btn.disabled = true;
+            btnText.textContent = 'Signing in…';
+            btnSpinner.classList.remove('hidden');
+            btnIcon.classList.add('hidden');
+            errorMsg.classList.add('hidden');
+
+            setTimeout(() => {
+                if (attemptLogin(username, password)) {
+                    // Clear any old screening data on fresh login
+                    localStorage.removeItem('screening_step1');
+                    localStorage.removeItem('screening_step2');
+                    localStorage.removeItem('screening_step3');
+                    window.location.href = 'screeing step1.html';
+                } else {
+                    // Shake + error
+                    card.classList.add('shake');
+                    errorMsg.classList.remove('hidden');
+                    setTimeout(() => card.classList.remove('shake'), 400);
+                    btn.disabled = false;
+                    btnText.textContent = 'Sign In';
+                    btnSpinner.classList.add('hidden');
+                    btnIcon.classList.remove('hidden');
+                }
+            }, 600);
+            return false;
+        }
+    </script>
+</body>
+
+</html>

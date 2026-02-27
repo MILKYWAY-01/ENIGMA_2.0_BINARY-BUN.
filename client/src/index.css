@@ -1,0 +1,87 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --font-sans: 'Inter', sans-serif;
+    --font-serif: 'Playfair Display', serif;
+    --font-mono: 'JetBrains Mono', monospace;
+
+    /* Deep Navy / Teal Base */
+    --background: 222 47% 7%;
+    --foreground: 210 40% 98%;
+
+    --card: 222 47% 10%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 222 47% 10%;
+    --popover-foreground: 210 40% 98%;
+
+    /* Electric Cyan Primary */
+    --primary: 186 100% 50%;
+    --primary-foreground: 222 47% 11%;
+
+    /* Dark Teal Secondary */
+    --secondary: 174 100% 20%;
+    --secondary-foreground: 186 100% 80%;
+
+    --muted: 222 47% 15%;
+    --muted-foreground: 215 20.2% 70%;
+
+    --accent: 186 100% 50%;
+    --accent-foreground: 222 47% 11%;
+
+    --destructive: 348 83% 55%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 222 47% 16%;
+    --input: 222 47% 16%;
+    --ring: 186 100% 50%;
+    
+    --radius: 0.5rem;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    /* Subtle grid texture for medical precision feel */
+    background-image: 
+      linear-gradient(to right, rgba(0, 229, 255, 0.03) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(0, 229, 255, 0.03) 1px, transparent 1px);
+    background-size: 32px 32px;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-serif tracking-tight text-white;
+  }
+}
+
+@layer utilities {
+  .text-glow {
+    text-shadow: 0 0 10px rgba(0, 229, 255, 0.5);
+  }
+  .box-glow {
+    box-shadow: 0 0 20px rgba(0, 229, 255, 0.15);
+  }
+  .data-value {
+    @apply font-mono text-primary font-medium tracking-tight;
+  }
+}
+
+/* Custom AI DNA Helix Animation */
+@keyframes dna-spin {
+  0% { transform: rotateY(0deg); }
+  100% { transform: rotateY(360deg); }
+}
+.dna-loader {
+  perspective: 1000px;
+  transform-style: preserve-3d;
+  animation: dna-spin 3s linear infinite;
+}
